@@ -17,8 +17,6 @@ from datetime import datetime
 from .model import Model
 import psycopg
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
 DB_CONNECTION = "host=%s port=%s dbname=%s user=%s password=%s" % (os.getenv('DB_HOST'), os.getenv('DB_PORT'), os.getenv('DB_NAME'), os.getenv('DB_USER'), os.getenv('DB_PASS'))
 
