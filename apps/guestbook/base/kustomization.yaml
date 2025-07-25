@@ -15,4 +15,4 @@ resources:
 images:
   - name: guestbook
     newName: ghcr.io/heg-web/k8s-bfritscher
-    newTag: main-da8be90
+    newTag: main-e7dc43c
