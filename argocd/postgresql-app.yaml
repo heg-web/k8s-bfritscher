@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 12.12.10
+    helm:
+      values:
+        auth:
+          postgresPassword: "guestbook"
+          username: "guestbook"
+          password: "guestbook"
+          database: "guestbook"
+        
+        primary:
+          persistence:
+            enabled: true
+            size: 2Gi
+          
+          service:
+            ports:
+              postgresql: 5432
+          
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+        
+        metrics:
+          enabled: false
+        
+        # Create a service with a consistent name
+        fullnameOverride: "postgresql"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: guestbook
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

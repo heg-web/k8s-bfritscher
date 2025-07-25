@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: guestbook-ingress
+  annotations:
+    cert-manager.io/issuer: letsencrypt-guestbook-issuer
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: gb-heg.duckdns.org
+    http:
+      paths:
+      # Static files served by nginx
+      - path: /static
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-static-service
+            port:
+              number: 80
+      # All other requests go to the main app
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: guestbook-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - gb-heg.duckdns.org
+    secretName: guestbook-tls-cert

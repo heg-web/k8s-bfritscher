@@ -1,0 +1,97 @@
+name: Build and Deploy Guestbook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'  # Only trigger on changes in src folder
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=Guestbook Application
+            org.opencontainers.image.description=A simple Python Flask guestbook application with PostgreSQL backend
+            org.opencontainers.image.vendor=HE-Arc
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.documentation=https://github.com/${{ github.repository }}/blob/main/README.md
+            org.opencontainers.image.url=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created={{date 'YYYY-MM-DDTHH:mm:ssZ'}}
+            org.opencontainers.image.authors=${{ github.actor }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src
+          file: ./src/Dockerfile.alpine
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+
+      - name: Update GitOps configuration
+        run: |
+          # Use the short SHA as the image tag
+          IMAGE_TAG="${{ github.sha }}"
+          SHORT_SHA=${IMAGE_TAG:0:7}
+          
+          echo "Updating image tag to: $SHORT_SHA"
+          
+          # Update the kustomization.yaml with new image tag
+          sed -i "s|newTag: .*|newTag: main-$SHORT_SHA|g" apps/guestbook/base/kustomization.yaml
+          
+          # Verify the change
+          echo "Updated kustomization.yaml:"
+          cat apps/guestbook/base/kustomization.yaml
+
+      - name: Commit and push GitOps changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add apps/guestbook/base/kustomization.yaml
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🚀 Update guestbook image to main-${GITHUB_SHA:0:7}
+            
+            - Built from commit: ${{ github.sha }}
+            - Triggered by: ${{ github.event.head_commit.message }}"
+            git push
+            echo "✅ Successfully updated GitOps configuration"
+          fi
