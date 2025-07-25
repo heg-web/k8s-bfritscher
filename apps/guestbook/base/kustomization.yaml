@@ -15,7 +15,7 @@ resources:
 images:
   - name: guestbook
     newName: ghcr.io/heg-web/k8s-bfritscher
-    newTag: main-591a58e
+    newTag: main-4beb8e6
 
 commonLabels:
   app: guestbook
