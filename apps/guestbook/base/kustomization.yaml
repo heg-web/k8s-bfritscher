@@ -6,7 +6,6 @@ namespace: guestbook
 resources:
   - guestbook-deployment.yaml
   - guestbook-service.yaml
-  - guestbook-configmap.yaml
   - nginx-deployment.yaml
   - nginx-service.yaml
   - nginx-configmap.yaml
