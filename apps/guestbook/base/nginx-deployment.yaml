@@ -18,10 +18,10 @@ spec:
         command: ['sh', '-c']
         args:
         - |
-          echo "Copying static files from /app/static to /shared/static"
-          mkdir -p /shared/static
-          cp -r /app/static/* /shared/static/ || echo "No static files found or copy failed"
-          ls -la /shared/static
+          echo "Copying static files from /app/static to /shared"
+          mkdir -p /shared
+          cp -r /app/static/* /shared/ || echo "No static files found or copy failed"
+          ls -la /shared
         volumeMounts:
         - name: static-volume
           mountPath: /shared
