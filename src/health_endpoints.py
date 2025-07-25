@@ -2,8 +2,9 @@
 
 from flask import jsonify
 from datetime import datetime
-import psycopg2
+import psycopg
 import os
+from gbmodel.model_sql_postgres import DB_CONNECTION
 
 def register_health_endpoints(app):
     """
@@ -36,22 +37,9 @@ def register_health_endpoints(app):
         Readiness probe endpoint - checks if the app is ready to serve traffic
         Returns 200 if ready, 503 if not ready (e.g., database not available)
         """
-        try:
-            # Check database connectivity
-            db_host = os.getenv('DB_HOST', 'postgresql')
-            db_port = os.getenv('DB_PORT', '5432')
-            db_name = os.getenv('DB_NAME', 'guestbook')
-            db_user = os.getenv('DB_USER', 'guestbook')
-            db_pass = os.getenv('DB_PASS', 'guestbook')
-            
+        try:            
             # Test database connection
-            conn = psycopg2.connect(
-                host=db_host,
-                port=db_port,
-                database=db_name,
-                user=db_user,
-                password=db_pass
-            )
+            conn = psycopg.connect(DB_CONNECTION)
             conn.close()
             
             return jsonify({
@@ -61,7 +49,7 @@ def register_health_endpoints(app):
                 "timestamp": datetime.utcnow().isoformat()
             }), 200
             
-        except psycopg2.OperationalError as e:
+        except psycopg.OperationalError as e:
             return jsonify({
                 "status": "not_ready",
                 "database": "disconnected",
