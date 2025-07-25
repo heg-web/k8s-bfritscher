@@ -16,7 +16,3 @@ images:
   - name: guestbook
     newName: ghcr.io/heg-web/k8s-bfritscher
     newTag: main-da8be90
-
-commonLabels:
-  app: guestbook
-  version: v1
