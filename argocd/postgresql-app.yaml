@@ -9,7 +9,7 @@ spec:
     repoURL: oci://registry-1.docker.io/bitnamicharts/postgresql
     targetRevision: 16.7.21
     helm:
-      values:
+      values: |
         auth:
           postgresPassword: "guestbook"
           username: "guestbook"
