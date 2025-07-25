@@ -9,8 +9,8 @@ LABEL org.opencontainers.image.title="Guestbook Application"
 LABEL org.opencontainers.image.description="A simple Python Flask guestbook application with PostgreSQL backend"
 LABEL org.opencontainers.image.vendor="HE-Arc"
 LABEL org.opencontainers.image.licenses="MIT"
-LABEL org.opencontainers.image.source="https://github.com/your-username/guestbook-gitops"
-LABEL org.opencontainers.image.documentation="https://github.com/your-username/guestbook-gitops/blob/main/README.md"
+LABEL org.opencontainers.image.source="https://github.com/heg-web/k8s-bfritscher"
+LABEL org.opencontainers.image.documentation="https://github.com/heg-web/k8s-bfritscher/blob/main/README.md"
 
 # Copy the contents of the current directory into the container directory /app
 COPY . /app

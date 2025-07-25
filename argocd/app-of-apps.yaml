@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/guestbook-gitops
+    repoURL: https://github.com/heg-web/k8s-bfritscher
     targetRevision: HEAD
     path: argocd
   destination:

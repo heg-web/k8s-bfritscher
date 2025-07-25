@@ -15,7 +15,7 @@ resources:
 
 images:
   - name: guestbook
-    newName: ghcr.io/your-username/guestbook-gitops
+    newName: ghcr.io/heg-web/k8s-bfritscher
     newTag: main-d08bc8f
 
 commonLabels:
